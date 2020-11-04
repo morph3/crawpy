@@ -1,30 +1,39 @@
 # Crawpy
+Yet another content discovery tool written in python.
 
-Crawpy is a web discovery tool. <br/>
-It's main purpose is to have a general recon of the given URL.<br/>
-Crawpy can do recursive scan, take screenshots for given status codes.
+What makes this tool different:
+* It is written to work asynchronous whichs allows reaching to maximum limits. Therefore, it is very fast.
+* Calibration mode, applies filters on its own
+* Has bunch of flags that make you fuzz in detail
+* Rcursive scan mode for given status codes
+* TODO: screenshot mode
+* TODO: output report generation
 
+### An example run
+[![asciicast](https://asciinema.org/a/370172.svg)](https://asciinema.org/a/370172)
 
-### Basic Discovery
-[![asciicast](https://asciinema.org/a/jVPdNGGpafo3K4feQRoSuCpLI.svg)](https://asciinema.org/a/jVPdNGGpafo3K4feQRoSuCpLI?speed=3)
+### An example run with auto calibration mode enabled
+[![asciicast](https://asciinema.org/a/370475.svg)](https://asciinema.org/a/370475)
 
-### Recursive Discovery
-[![asciicast](https://asciinema.org/a/lKav0RTvViRmj8db9hyJALOfn.svg)](https://asciinema.org/a/lKav0RTvViRmj8db9hyJALOfn?speed=10)
-### Screenshot Mode
-![gif](https://github.com/morph3/crawpy/blob/master/screenshots/crawpy.gif)
-
+### An example run with recursive mode enabled
+[![asciicast](https://asciinema.org/a/370161.svg)](https://asciinema.org/a/370161)
 
 # Installation
 ```
 git clone https://github.com/morph3/crawpy
-pip install -r requirements.txt
+pip3 install -r requirements.txt 
+or
+python3 -m pip install -r requirements.txt
 ```
 
-# Usage 
+# Usage
 ```
-python main.py --help
-usage: main.py [-h] [-u URL] [-w WORDLIST] [-t THREADS] [-r] [-x EXTENTION]
-               [-to TIMEOUT] [-ss [SCREENSHOT]] [-s STATUS] [-o OUTPUT]
+python3 crawpy.py
+usage: crawpy.py [-h] [-u URL] [-w WORDLIST] [-t THREADS] [-r RECURSIVE]
+                 [-rd RECURSIVE_DEPTH] [-e EXTENSIONS] [-to TIMEOUT]
+                 [-ss SCREENSHOT] [-follow] [-ac] [-fc FILTER_CODE]
+                 [-fs FILTER_SIZE] [-fw FILTER_WORD] [-fl FILTER_LINE] [-k]
+                 [-m MAX_RETRY] [-H HEADERS] [-o OUTPUT] [-X HTTP_METHOD]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -32,35 +41,54 @@ optional arguments:
   -w WORDLIST, --wordlist WORDLIST
                         Wordlist
   -t THREADS, --threads THREADS
-                        Number of threads
-  -r, --recursive       Recursive scan
-  -x EXTENTION, --extention EXTENTION
-                        Add extentions at the end. Seperate them with comas
-                        example: -x php,html,txt
+                        Size of the semaphore pool
+  -r RECURSIVE, --recursive RECURSIVE
+                        Recursive scan, specify status codes Example:
+                        200,301,302
+  -rd RECURSIVE_DEPTH, --recursive-depth RECURSIVE_DEPTH
+                        Recursive scan depth,Example: 2
+  -e EXTENSIONS, --extension EXTENSIONS
+                        Add extensions at the end. Seperate them with comas
+                        Example: -x .php,.html,.txt
   -to TIMEOUT, --timeout TIMEOUT
-                        Timeout
-  -ss [SCREENSHOT], --screenshot [SCREENSHOT]
+                        Timeouts, I suggest you to not use this option because
+                        it is procudes lots of erros now which I was not able
+                        to solve why
+  -ss SCREENSHOT, --screenshot SCREENSHOT
                         Takes screenshot of valid requests. Default is
                         200,204,301,302,307
-  -s STATUS, --status-code STATUS
-                        Status codes to be checked Default is
-                        200,204,301,302,307
+  -follow, --follow-redirects
+                        Follow redirects
+  -ac, --auto-calibrate
+                        Automatically calibre filter stuff
+  -fc FILTER_CODE, --filter-code FILTER_CODE
+                        Filter status code
+  -fs FILTER_SIZE, --filter-size FILTER_SIZE
+                        Filter size
+  -fw FILTER_WORD, --filter-word FILTER_WORD
+                        Filter words
+  -fl FILTER_LINE, --filter-line FILTER_LINE
+                        Filter line
+  -k, --ignore-ssl      Ignore untrusted SSL certificate
+  -m MAX_RETRY, --max-retry MAX_RETRY
+                        Max retry
+  -H HEADERS, --headers HEADERS
+                        Headers, you can set the flag multiple times.For
+                        example: -H "X-Forwarded-For: 127.0.0.1", -H "Host:
+                        foobar"
   -o OUTPUT, --output OUTPUT
                         Output file
+  -X HTTP_METHOD, --http-method HTTP_METHOD
+                        HTTP request method
 ```
+
 
 # Examples
+```
+python3 crawpy.py -u https://facebook.com/FUZZ -w ./common.txt  -k -ac  -e .php,.html
+python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -k -fw 9,83 -r 301,302 -rd 2
+python3 crawpy.py -u https://facebook.com/FUZZ -w ./common.txt  -k -ac  -e .php,.html
+```
 
-```
-python main.py -u https://morph3sec.com -w common.txt --screenshot 200
-python main.py -u https://morph3sec.com -w common.txt --screenshot 200 -r --status-code 200,301 -o output.txt
-```
 
 
-# TODO:
-```
-Virtual Host Fuzzing 
-Custom Header on requests 
-Subnet Discovery 
-Optimizations 
-```
