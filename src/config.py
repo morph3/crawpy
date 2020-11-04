@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+config = {
+        'is_recursive' : False,
+        'wordlist' : "",
+        'threads' : 20, # default, asynchronous so 
+        'timeout' : 0,
+        'extensions' : [], #list of extensipons
+        'base_url' : "",
+        'directories' : [],
+        'http_method' : "GET",
+        'screenshot_mode' : False,
+        'screenshot_codes' : [],
+        'verify_ssl' : True,
+        'follow_redirects' : False,
+        'recursive_codes' : [],
+        'recursive_depth' : -1,
+        'auto_calibrate' : False,
+        # Matchers 
+        'filter_code' : [],
+        'filter_string' : [],
+        'filter_size' : [],
+        'filter_word' : [],
+        'filter_line' : [],
+        'headers' : {
+            'User-Agent' : 'crawpy/1.0 - github.com/morph3',
+        }
+}

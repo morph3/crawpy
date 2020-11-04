@@ -1,0 +1,5 @@
+colorama
+termios
+asyncio
+aiohttp
+tqdm
