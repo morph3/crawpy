@@ -87,7 +87,7 @@ optional arguments:
 ```
 python3 crawpy.py -u https://facebook.com/FUZZ -w ./common.txt  -k -ac  -e .php,.html
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -k -fw 9,83 -r 301,302 -rd 2
-python3 crawpy.py -u https://facebook.com/FUZZ -w ./common.txt  -k -ac  -e .php,.html
+python3 crawpy.py -u https://morph3sec.com/FUZZ -w /opt/wordlists/morph3-quick.txt -e .php,.html -t 20 -ac -k
 ```
 
 
