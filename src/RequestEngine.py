@@ -32,9 +32,10 @@ class RequestEngine:
         self.base_url_length = len(self.conf['base_url'])
         self.async_session = None
         self.found_urls =  [] 
+        self.recursing_urls = []
+        self.is_recursing = False
         self.progress_bar = None
         self.error_count = 0
-        
 
     @surpress
     async def calibrate_fetch(self, session, url, semaphore, report):
@@ -175,9 +176,11 @@ class RequestEngine:
                     # note that alignment is not static, if we want to make it dynamic we will lose some speed so skipping now
                     info = f"[Words:{word_count}, Size:{size_count}, Lines:{line_count}]"
 
-                    if (status_code in self.conf['recursive_codes']) and (self.conf['recursive_depth'] - 1  != 0):
+                    if (status_code in self.conf['recursive_codes']) and (self.is_recursing == False):
                         # for recursive scans
                         self.found_urls.append(url)
+                    if(status_code in self.conf['recursive_codes']) and (self.is_recursing == True):
+                        self.recursing_urls.append(url)
 
                     if status_code < 300:
                         self.progress_bar.clear()
@@ -235,6 +238,8 @@ class RequestEngine:
             
             while self.conf['recursive_depth'] != 0:
                 for url in self.found_urls:
+                    self.is_recursing = True
+
                     self.conf['base_url'] = url+"/FUZZ"
                     self.progress_bar.clear()
                     sys.stdout.write(f"\n{MAGENTA}[*] {self.conf['base_url']}{RESET}\n")
@@ -252,5 +257,6 @@ class RequestEngine:
                         for u in self.crafted_urls:
                             tasks.append(self.fetch(session, u, semaphore))
                         await asyncio.wait(tasks)
-
+                self.found_urls = []
+                self.found_urls = self.recursing_urls.copy()
                 self.conf['recursive_depth'] -= 1

@@ -21,6 +21,10 @@ config = {
         'filter_size' : [],
         'filter_word' : [],
         'filter_line' : [],
+        'filter_code_backup' : [],
+        'filter_size_backup' : [],
+        'filter_word_backup' : [],
+
         'headers' : {
             'User-Agent' : 'crawpy/1.0 - github.com/morph3',
         }

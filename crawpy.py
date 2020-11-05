@@ -16,7 +16,6 @@ TODO:
     Screenshot mode
     Output, report generation
 
-    Recursion mode is not working in the way i wanted but its still good so im not going to change it
 """
 
 if __name__ == "__main__":
