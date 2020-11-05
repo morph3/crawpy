@@ -203,11 +203,17 @@ class RequestEngine:
                         status = status.ljust(self.base_url_length+30)
                         sys.stdout.write(f"{status}{info} \n")
 
+    async def backup_filters(self):
+        self.conf['filter_code'] = self.conf['filter_code_backup'].copy()
+        self.conf['filter_size'] = self.conf['filter_size_backup'].copy()
+        self.conf['filter_word'] = self.conf['filter_word_backup'].copy()
+        return
         
     @surpress
     async def run(self):
+        
         if self.conf['auto_calibrate']:
-            #sys.stdout.write(f"{YELLOW}Calibration started{RESET}\n")
+            # backup
             await self.calibrate()
             #sys.exit(1)
 
@@ -232,6 +238,11 @@ class RequestEngine:
                     self.conf['base_url'] = url+"/FUZZ"
                     self.progress_bar.clear()
                     sys.stdout.write(f"\n{MAGENTA}[*] {self.conf['base_url']}{RESET}\n")
+
+                    if self.conf['auto_calibrate']:
+                        await self.backup_filters()
+                        await self.calibrate()
+
                     self.craft_urls()
                     self.update_extensions()
                     self.prepare_pbar()

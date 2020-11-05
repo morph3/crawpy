@@ -108,6 +108,10 @@ if __name__ == "__main__":
     if len(args.recursive) > 0:
         conf['is_recursive'] = True
         conf['recursive_codes'] = [int(_) for _ in args.recursive.split(",")]
+        conf['filter_code_backup'] = conf['filter_code'].copy()
+        conf['filter_size_backup'] = conf['filter_size'].copy()
+        conf['filter_word_backup'] = conf['filter_word'].copy()
+        
         if args.recursive_depth == -1:
             sys.stdout.write(f"{RED}[!] You must enter a recursion depth! {RESET}\n")
             sys.exit(1)
