@@ -1,22 +1,20 @@
 # Crawpy
 Yet another content discovery tool written in python.
 
-What makes this tool different:
-* It is written to work asynchronous whichs allows reaching to maximum limits. Therefore, it is very fast.
+What makes this tool different than others:
+* It is written to work asynchronous which allows reaching to maximum limits. Therefore, it is very fast.
 * Calibration mode, applies filters on its own
 * Has bunch of flags that make you fuzz in detail
-* Rcursive scan mode for given status codes
-* TODO: screenshot mode
-* TODO: output report generation
+* Recursive scan mode for given status codes
+* TODO: Screenshot mode
+* TODO: Output report generation
 
 ### An example run
 [![asciicast](https://asciinema.org/a/370172.svg)](https://asciinema.org/a/370172)
 
-### An example run with auto calibration mode enabled
-[![asciicast](https://asciinema.org/a/370475.svg)](https://asciinema.org/a/370475)
+### An example run with auto calibration and recursive mode enabled
+[![asciicast](https://asciinema.org/a/370486.svg)](https://asciinema.org/a/370486)
 
-### An example run with recursive mode enabled
-[![asciicast](https://asciinema.org/a/370161.svg)](https://asciinema.org/a/370161)
 
 # Installation
 ```
