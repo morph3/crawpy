@@ -68,7 +68,7 @@ class RequestEngine:
         for i in range(5):
             random_strs.append(''.join(random.choice(string.ascii_letters) for i in range(random.randint(3,20))))
         random_strs[0] = random_strs[0] + ".unknown_ext"
-        random_strs[-1] = random_strs[-1] + ".foobar"
+        random_strs[-1] = random_strs[-1] + ".php"
 
 
         semaphore = asyncio.Semaphore(5)
