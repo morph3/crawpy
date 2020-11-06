@@ -1,5 +1,4 @@
 import time
-import termios
 import sys
 import argparse
 from colorama import *
@@ -17,6 +16,15 @@ TODO:
     Output, report generation
 
 """
+def flush_input():
+    try:
+        import msvcrt
+        while msvcrt.kbhit():
+            msvcrt.getch()
+    except ImportError:
+        import termios    #for linux/unix
+        termios.tcflush(sys.stdin, termios.TCIOFLUSH)
+
 
 if __name__ == "__main__":
     init()
@@ -151,7 +159,9 @@ if __name__ == "__main__":
         sys.stdout.write(f"{YELLOW}[!] Recursive scan enabled with depth {conf['recursive_depth']}{RESET}\n")
 
 
-    os.system("stty -echo")
+    if os.name != 'nt':
+        os.system("stty -echo")
+    
     requester = RequestEngine(conf)
     loop = asyncio.get_event_loop()
     #loop.set_debug(1)
@@ -167,10 +177,10 @@ if __name__ == "__main__":
         pass
 
 
-    os.system("stty echo")
+    if os.name != 'nt':
+        os.system("stty echo")    
     
-    termios.tcflush(sys.stdin, termios.TCIFLUSH)
-    
+    flush_input()
 
 
     # screenshot section
