@@ -24,7 +24,7 @@ config = {
         'filter_code_backup' : [],
         'filter_size_backup' : [],
         'filter_word_backup' : [],
-
+        'proxy_server': None,
         'headers' : {
             'User-Agent' : 'crawpy/1.0 - github.com/morph3',
         }

@@ -66,6 +66,8 @@ if __name__ == "__main__":
 
     parser.add_argument("-o","--output", dest="output", default ="",help="Output file" )
     parser.add_argument("-X","--http-method", dest="http_method", default="GET",help="HTTP request method")
+    parser.add_argument("-p","--proxy", dest="proxy_server",help="Proxy server, ex: 'http://127.0.0.1:8080'")
+
 
     args = parser.parse_args()
 
@@ -89,7 +91,7 @@ if __name__ == "__main__":
     conf['follow_redirects'] = args.follow_redirects
     conf['recursive_depth'] = args.recursive_depth
     conf['auto_calibrate'] = args.auto_calibrate
-
+    conf['proxy_server'] = args.proxy_server
 
     if args.headers != None:
         for header in args.headers:
@@ -151,7 +153,8 @@ if __name__ == "__main__":
     if len(conf['filter_line']) > 0:
         sys.stdout.write(f"{YELLOW}[*] Filter line: {conf['filter_line']}\n{RESET}")
 
-
+    if conf['proxy_server']:
+        sys.stdout.write(f"{YELLOW}[*] Proxy server: {conf['proxy_server']}{RESET}\n")
     if conf['screenshot_mode']:
         sys.stdout.write(f"{GREEN}[*] Screenshot mod is enabled for status codes : {screenshot_codes} {RESET}\n")
 
@@ -162,6 +165,7 @@ if __name__ == "__main__":
     if os.name != 'nt':
         os.system("stty -echo")
     
+
     requester = RequestEngine(conf)
     loop = asyncio.get_event_loop()
     #loop.set_debug(1)

@@ -155,14 +155,15 @@ class RequestEngine:
     @surpress
     async def fetch(self,session, url, semaphore):
         async with semaphore:
+            #sys.stdout.write(f"{GREEN}{self.conf['proxy_server']}{RESET}\n")
             async with session.request(
                                         self.conf['http_method'], 
                                         url, 
                                         allow_redirects=self.conf['follow_redirects'], 
                                         headers=self.conf['headers'], 
                                         timeout=aiohttp.client.ClientTimeout(
-                                        total=self.conf['timeout']) 
-                                                            ) as response:
+                                        total=self.conf['timeout']), 
+                                        proxy=self.conf['proxy_server']) as response:
                 self.progress_bar.update(1)
                 status_code = response.status
                 _text = await response.text()
