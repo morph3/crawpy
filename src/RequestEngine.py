@@ -138,7 +138,7 @@ class RequestEngine:
         else:
             self.progress_bar = tqdm(
                 total=self.crafted_urls_length, ncols=50,desc="Fuzzing",
-                bar_format="Fuzzing -> {percentage:3.2f}% {bar} {n_fmt}/{total_fmt} {rate_fmt:.5}req/s #")
+                bar_format="[{rate_fmt:.5}]req/s -> {percentage:3.2f}% {bar} {n_fmt}/{total_fmt} #")
         return
 
     def update_extensions(self):
