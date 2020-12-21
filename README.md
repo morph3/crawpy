@@ -8,7 +8,6 @@ What makes this tool different than others:
 * Recursive scan mode for given status codes
 * Report generation 
 
-TODO: improved calibration mode
 TODO: mass fuzz
 TODO: screenshot mode, serv them with http
 

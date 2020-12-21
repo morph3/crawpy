@@ -64,13 +64,17 @@ class RequestEngine:
 
     @surpress
     async def calibrate(self):
+        # For better calibration send 8 requests, eliminate if there are <2 patterns in those 8 requests, apply them as filters
         # Generate random strings
+        # calibration might miss abit at this point but its really good for mass fuzzing
         random_strs = []
-        for i in range(5):
+        for i in range(8):
             random_strs.append(''.join(random.choice(string.ascii_letters) for i in range(random.randint(3,20))))
+        # most common extensions and an invalid extension
         random_strs[0] = random_strs[0] + ".unknown_ext"
         random_strs[-1] = random_strs[-1] + ".php"
-
+        random_strs[-2] = random_strs[-2] + ".js"
+        random_strs[-3] = random_strs[-3] + ".asp"
 
         semaphore = asyncio.Semaphore(5)
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=self.conf['verify_ssl']) ) as session:
@@ -104,16 +108,27 @@ class RequestEngine:
             """
 
 
-
         # apply them as filters
+        # i think we can trust only 1 filter code
         if len(set(status_codes)) == 1:
-            self.conf['filter_code'].append(status_codes[0])
+                self.conf['filter_code'].append(status_codes[0])
 
         if len(set(word_counts)) == 1:
             self.conf['filter_word'].append(word_counts[0])
 
+        elif len(set(word_counts)) == 2:
+            _list = list(set(word_counts))
+            self.conf['filter_word'].append(_list[0])
+            self.conf['filter_word'].append(_list[1])
+
         if len(set(size_counts)) == 1:
             self.conf['filter_size'].append(size_counts[0])
+
+        elif len(set(size_counts)) == 2:
+            _list = list(set(size_counts))
+            self.conf['filter_size'].append(_list[0])
+            self.conf['filter_size'].append(_list[1])
+
 
         sys.stdout.write(f"{YELLOW}[*] Calibrated, applied filters:\n{RESET}")
         sys.stdout.write(f"{YELLOW}[*] Filter codes: {self.conf['filter_code']}\n{RESET}")
