@@ -68,13 +68,16 @@ class RequestEngine:
         # Generate random strings
         # calibration might miss abit at this point but its really good for mass fuzzing
         random_strs = []
-        for i in range(8):
+        for i in range(10):
             random_strs.append(''.join(random.choice(string.ascii_letters) for i in range(random.randint(3,20))))
         # most common extensions and an invalid extension
         random_strs[0] = random_strs[0] + ".unknown_ext"
         random_strs[-1] = random_strs[-1] + ".php"
+        random_strs[-1] = random_strs[-1] + ".php"
         random_strs[-2] = random_strs[-2] + ".js"
-        random_strs[-3] = random_strs[-3] + ".asp"
+        random_strs[-2] = random_strs[-2] + ".js"
+        random_strs[-3] = random_strs[-3] + ".aspx"
+        random_strs[-3] = random_strs[-3] + ".aspx"
 
         semaphore = asyncio.Semaphore(5)
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=self.conf['verify_ssl']) ) as session:
