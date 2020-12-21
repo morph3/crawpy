@@ -95,7 +95,7 @@ if __name__ == "__main__":
     if args.generate_report:
         conf['generate_report_enabled'] = True
         if "reports/" in args.output_file:
-            _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","") # i know this is ugly but it works
+            _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","_") # i know this is ugly but it works
             conf['output_file'] = open(f"{args.output_file}{_url}.txt","w")  
         else:
             conf['output_file'] = open(f"{args.output_file}","w") 
@@ -183,6 +183,10 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         sys.stdout.write(f"{RED}[!] Keyboard interrupt recieved, exiting ...{RESET}\n")
+        try: 
+            conf['output_file'].close() # try to close the file on interrupts
+        except:
+            pass
         pass
     except:
         pass
