@@ -37,6 +37,7 @@ class RequestEngine:
         self.progress_bar = None
         self.error_count = 0
 
+        
     @surpress
     async def calibrate_fetch(self, session, url, semaphore, report):
         async with semaphore:
@@ -137,7 +138,7 @@ class RequestEngine:
         else:
             self.progress_bar = tqdm(
                 total=self.crafted_urls_length, ncols=50,desc="Fuzzing",
-                bar_format="Fuzzing -> {percentage:3.2f}% {bar} {n_fmt}/{total_fmt} #")
+                bar_format="Fuzzing -> {percentage:3.2f}% {bar} {n_fmt}/{total_fmt} {rate_fmt:.5}req/s #")
         return
 
     def update_extensions(self):
@@ -182,30 +183,42 @@ class RequestEngine:
                         self.found_urls.append(url)
                     if(status_code in self.conf['recursive_codes']) and (self.is_recursing == True):
                         self.recursing_urls.append(url)
-
+                    
                     if status_code < 300:
                         self.progress_bar.clear()
-                        status = f"{GREEN}[{status_code}] {url} {RESET}"
-                        status = status.ljust(self.base_url_length+30)
-                        sys.stdout.write(f"{status}{info} \n")
-                                                
+                        _url = f"{GREEN}[{status_code}] {url} {RESET}"
+                        _url = _url.ljust(self.base_url_length+30)
+                        sys.stdout.write(f"{_url}{info} \n")
+                        
+                        if self.conf['generate_report_enabled']:
+                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
+
                     elif status_code >= 300 and status_code < 400:
                         self.progress_bar.clear()
-                        status = f"{BLUE}[{status_code}] {url} {RESET}"
-                        status = status.ljust(self.base_url_length+30)
-                        sys.stdout.write(f"{status}{info} \n")
+                        _url = f"{BLUE}[{status_code}] {url} {RESET}"
+                        _url = _url.ljust(self.base_url_length+30)
+                        sys.stdout.write(f"{_url}{info} \n")
+
+                        if self.conf['generate_report_enabled']:
+                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
                     
                     elif status_code >= 400 and status_code < 403:
                         self.progress_bar.clear()
-                        status = f"{YELLOW}[{status_code}] {url} {RESET}"
-                        status = status.ljust(self.base_url_length+30)
-                        sys.stdout.write(f"{status}{info} \n")
+                        _url = f"{YELLOW}[{status_code}] {url} {RESET}"
+                        _url = _url.ljust(self.base_url_length+30)
+                        sys.stdout.write(f"{_url}{info} \n")
+
+                        if self.conf['generate_report_enabled']:
+                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
                     
                     elif status_code >= 404:
                         self.progress_bar.clear()                     
-                        status = f"{RED}[{status_code}] {url} {RESET}"
-                        status = status.ljust(self.base_url_length+30)
-                        sys.stdout.write(f"{status}{info} \n")
+                        _url = f"{RED}[{status_code}] {url} {RESET}"
+                        _url = _url.ljust(self.base_url_length+30)
+                        sys.stdout.write(f"{_url}{info} \n")
+
+                        if self.conf['generate_report_enabled']:
+                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
 
     async def backup_filters(self):
         self.conf['filter_code'] = self.conf['filter_code_backup'].copy()

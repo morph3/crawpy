@@ -10,12 +10,7 @@ from src.Banner import Banner
 import asyncio
 import aiohttp
 
-"""
-TODO:
-    Screenshot mode
-    Output, report generation
 
-"""
 def flush_input():
     try:
         import msvcrt
@@ -27,6 +22,8 @@ def flush_input():
 
 
 if __name__ == "__main__":
+    base_path = os.path.abspath(os.path.dirname(__file__))
+
     init()
     GREEN   = Fore.GREEN
     RED     = Fore.RED
@@ -63,8 +60,9 @@ if __name__ == "__main__":
     parser.add_argument("-m","--max-retry", dest="max_retry", default=3,help="Max retry")
     parser.add_argument("-H","--headers", dest="headers", action='append', help="Headers, you can set the flag multiple times.For example: -H \"X-Forwarded-For: 127.0.0.1\", -H \"Host: foobar\" ")
 
+    parser.add_argument("-o","--output", dest="output_file", default=f"{base_path}/reports/", help="Output file" )
+    parser.add_argument("-gr","--generate-report", dest="generate_report", action="store_true", help="If you want crawpy to generate a report, default path is crawpy/reports/<url>.txt" )
 
-    parser.add_argument("-o","--output", dest="output", default ="",help="Output file" )
     parser.add_argument("-X","--http-method", dest="http_method", default="GET",help="HTTP request method")
     parser.add_argument("-p","--proxy", dest="proxy_server",help="Proxy server, ex: 'http://127.0.0.1:8080'")
 
@@ -92,6 +90,15 @@ if __name__ == "__main__":
     conf['recursive_depth'] = args.recursive_depth
     conf['auto_calibrate'] = args.auto_calibrate
     conf['proxy_server'] = args.proxy_server
+
+    # output
+    if args.generate_report:
+        conf['generate_report_enabled'] = True
+        if "reports/" in args.output_file:
+            _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","") # i know this is ugly but it works
+            conf['output_file'] = open(f"{args.output_file}{_url}.txt","w")  
+        else:
+            conf['output_file'] = open(f"{args.output_file}","w") 
 
     if args.headers != None:
         for header in args.headers:
@@ -157,10 +164,10 @@ if __name__ == "__main__":
         sys.stdout.write(f"{YELLOW}[*] Proxy server: {conf['proxy_server']}{RESET}\n")
     if conf['screenshot_mode']:
         sys.stdout.write(f"{GREEN}[*] Screenshot mod is enabled for status codes : {screenshot_codes} {RESET}\n")
-
     if conf['is_recursive']:
         sys.stdout.write(f"{YELLOW}[!] Recursive scan enabled with depth {conf['recursive_depth']}{RESET}\n")
-
+    if conf['generate_report_enabled']:
+        sys.stdout.write(f"{YELLOW}[!] Generate report enabled, writing: {conf['output_file'].name}{RESET}\n")
 
     if os.name != 'nt':
         os.system("stty -echo")
@@ -184,6 +191,9 @@ if __name__ == "__main__":
     if os.name != 'nt':
         os.system("stty echo")    
     
+    if conf['generate_report_enabled']:
+        conf['output_file'].close()
+
     flush_input()
 
 

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 config = {
         'is_recursive' : False,
+        'generate_report_enabled' : False,
+        'output_file' : None,
         'wordlist' : "",
         'threads' : 20, # default, asynchronous so 
         'timeout' : 0,
