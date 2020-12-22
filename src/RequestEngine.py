@@ -114,7 +114,11 @@ class RequestEngine:
         # apply them as filters
         # i think we can trust only 1 filter code
         if len(set(status_codes)) == 1:
-                self.conf['filter_code'].append(status_codes[0])
+            self.conf['filter_code'].append(status_codes[0])
+
+        elif len(set(status_codes)) == 2:
+            _list = list(set(status_codes))
+            self.conf['filter_code'].append(_list[0]) # only add one of them, highest of them
 
         if len(set(word_counts)) == 1:
             self.conf['filter_word'].append(word_counts[0])
