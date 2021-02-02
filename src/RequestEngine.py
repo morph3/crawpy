@@ -213,7 +213,8 @@ class RequestEngine:
                         sys.stdout.write(f"{_url}{info} \n")
                         
                         if self.conf['generate_report_enabled']:
-                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
+                            self.conf['output_file'].write(f"{_} {info} \n")
 
                     elif status_code >= 300 and status_code < 400:
                         self.progress_bar.clear()
@@ -222,7 +223,8 @@ class RequestEngine:
                         sys.stdout.write(f"{_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
+                            self.conf['output_file'].write(f"{_} {info} \n")
                     
                     elif status_code >= 400 and status_code < 403:
                         self.progress_bar.clear()
@@ -231,7 +233,8 @@ class RequestEngine:
                         sys.stdout.write(f"{_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
+                            self.conf['output_file'].write(f"{_} {info} \n")
                     
                     elif status_code >= 404:
                         self.progress_bar.clear()                     
@@ -240,7 +243,8 @@ class RequestEngine:
                         sys.stdout.write(f"{_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            self.conf['output_file'].write(f"[{status_code}] {url}\n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
+                            self.conf['output_file'].write(f"{_} {info} \n")
 
     async def backup_filters(self):
         self.conf['filter_code'] = self.conf['filter_code_backup'].copy()
