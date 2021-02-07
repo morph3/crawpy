@@ -7,7 +7,6 @@ import os
 from src.RequestEngine import RequestEngine
 from src.Banner import Banner
 import asyncio
-import multiprocessing as mp
 import concurrent.futures
 import subprocess
 
@@ -34,12 +33,13 @@ def new_session(url):
         args = args.replace(f" -l {tmp}","")
 
         args += f" -u {url}/FUZZ"
-        args = base_path+"/"+args
         args = args.split(" ")
         if '-s' in args:
-            subprocess.call(args,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+            stdout, stderr = proc.communicate()
         else:
-            subprocess.call(args)
+            proc = subprocess.Popen(args)
+            stdout, stderr = proc.communicate()
 
 
 
