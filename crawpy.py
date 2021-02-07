@@ -1,4 +1,4 @@
-import time
+#!/usr/bin/python3
 import sys
 import argparse
 from colorama import *
@@ -6,9 +6,42 @@ import src.config
 import os
 from src.RequestEngine import RequestEngine
 from src.Banner import Banner
-#from src.Interact import Interact
 import asyncio
-import aiohttp
+import multiprocessing as mp
+import concurrent.futures
+import subprocess
+
+base_path = os.path.abspath(os.path.dirname(__file__))
+
+init()
+GREEN   = Fore.GREEN
+RED     = Fore.RED
+RESET   = Fore.RESET
+BLUE    = Fore.BLUE
+YELLOW  = Fore.YELLOW
+MAGENTA  = Fore.MAGENTA
+
+
+def new_session(url):
+        # we need to strip -lt  and -l flags from it
+        sys.stdout.write(f"{MAGENTA}[*] Fuzzing: {url}/FUZZ\n{RESET}")
+
+        args = " ".join(sys.argv)
+        tmp = args.split('-lt ', maxsplit=1)[-1].split(maxsplit=1)[0]    
+        args = args.replace(f" -lt {tmp}","")
+
+        tmp = args.split('-l ', maxsplit=1)[-1].split(maxsplit=1)[0]    
+        args = args.replace(f" -l {tmp}","")
+
+        args += f" -u {url}/FUZZ"
+        args = base_path+"/"+args
+        args = args.split(" ")
+        if '-s' in args:
+            subprocess.call(args,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            subprocess.call(args)
+
+
 
 
 def flush_input():
@@ -22,14 +55,8 @@ def flush_input():
 
 
 if __name__ == "__main__":
-    base_path = os.path.abspath(os.path.dirname(__file__))
 
-    init()
-    GREEN   = Fore.GREEN
-    RED     = Fore.RED
-    RESET   = Fore.RESET
-    BLUE    = Fore.BLUE
-    YELLOW  = Fore.YELLOW
+
 
     parser = argparse.ArgumentParser()
 
@@ -45,7 +72,6 @@ if __name__ == "__main__":
 
     parser.add_argument("-e", "--extension", dest="extensions",default=[],help="Add extensions at the end. Seperate them with comas \n Example: -x .php,.html,.txt")
     parser.add_argument("-to", "--timeout", dest="timeout",default=5, help="Timeouts, I suggest you to not use this option because it is procudes lots of erros now which I was not able to solve why")
-    parser.add_argument("-ss", "--screenshot", dest="screenshot", default=[],help="Takes screenshot of valid requests.\nDefault is 200,204,301,302,307")
     parser.add_argument("-follow", "--follow-redirects", dest="follow_redirects",action='store_true', help="Follow redirects")
     
     # Filter options
@@ -60,8 +86,15 @@ if __name__ == "__main__":
     parser.add_argument("-m","--max-retry", dest="max_retry", default=3,help="Max retry")
     parser.add_argument("-H","--headers", dest="headers", action='append', help="Headers, you can set the flag multiple times.For example: -H \"X-Forwarded-For: 127.0.0.1\", -H \"Host: foobar\" ")
 
-    parser.add_argument("-o","--output", dest="output_file", default=f"{base_path}/reports/", help="Output file" )
+    parser.add_argument("-o","--output", dest="output_file", default=f"{base_path}/reports/", help="Output folder")
     parser.add_argument("-gr","--generate-report", dest="generate_report", action="store_true", help="If you want crawpy to generate a report, default path is crawpy/reports/<url>.txt" )
+
+
+    # list related args
+    parser.add_argument("-l","--list", dest="url_list", help="Takes a list of urls as input and runs crawpy on via multiprocessing\n-l ./urls.txt")
+    parser.add_argument("-lt","--list-threads", type=int, default=10, dest="list_threads", help="Number of threads for running crawpy parallely when running with list of urls")
+    parser.add_argument("-s","--silent", action='store_true', dest="silent", help="Make crawpy not produce output")
+    
 
     parser.add_argument("-X","--http-method", dest="http_method", default="GET",help="HTTP request method")
     parser.add_argument("-p","--proxy", dest="proxy_server",help="Proxy server, ex: 'http://127.0.0.1:8080'")
@@ -74,7 +107,21 @@ if __name__ == "__main__":
         sys.exit(0)
 
     Banner().greet()
+    
+    if args.url_list != None:
+        url_file = open(args.url_list,"r").read()
+        urls = url_file.split()
 
+
+        sys.stdout.write(f"{YELLOW}[!] URL List supplied: {args.url_list}\n{RESET}")
+        sys.stdout.write(f"{YELLOW}[!] Yielding url list on {args.list_threads} threads\n{RESET}")
+        sys.stdout.write(f"{YELLOW}[!] Wordlist: {args.wordlist}\n{RESET}")
+        sys.stdout.write(f"{YELLOW}[!] Semaphore pool for each session: {args.threads}\n{RESET}")
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.list_threads) as executor:
+            res = executor.map(new_session, urls)
+        #os.execve()
+        sys.exit()
 
     conf = src.config.config
     # initialize
@@ -98,7 +145,8 @@ if __name__ == "__main__":
             _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","_") # i know this is ugly but it works
             conf['output_file'] = open(f"{args.output_file}{_url}.txt","w")  
         else:
-            conf['output_file'] = open(f"{args.output_file}","w") 
+            _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","_") # i know this is ugly but it works
+            conf['output_file'] = open(f"{args.output_file}/{_url}","w") 
 
     if args.headers != None:
         for header in args.headers:
@@ -132,13 +180,6 @@ if __name__ == "__main__":
             sys.stdout.write(f"{RED}[!] You must enter a recursion depth! {RESET}\n")
             sys.exit(1)
 
-    # screenshot 
-    if len(args.screenshot) > 0:
-        conf['screenshot_mode'] = True
-        screenshot_codes = args.screenshot.split(",")
-    else:
-        conf['screenshot_mode'] = False
-
 
 
     #info section
@@ -162,8 +203,6 @@ if __name__ == "__main__":
 
     if conf['proxy_server']:
         sys.stdout.write(f"{YELLOW}[*] Proxy server: {conf['proxy_server']}{RESET}\n")
-    if conf['screenshot_mode']:
-        sys.stdout.write(f"{GREEN}[*] Screenshot mod is enabled for status codes : {screenshot_codes} {RESET}\n")
     if conf['is_recursive']:
         sys.stdout.write(f"{YELLOW}[!] Recursive scan enabled with depth {conf['recursive_depth']}{RESET}\n")
     if conf['generate_report_enabled']:
@@ -199,28 +238,3 @@ if __name__ == "__main__":
         conf['output_file'].close()
 
     flush_input()
-
-
-    # screenshot section
-    """
-    # Maybe do this in run func
-    if conf['screenshot_mode']:
-        if len(requester.screenshot_urls) < 1:
-            sys.stdout.write(f"{RED}[!]Not found any url , quiting...\n{RESET}")
-            sys.exit(1)
-        crawpy_ss = Interact("firefox")
-        for url in requester.screenshot_urls:
-            if str(url.status_code) in screenshot_codes:
-                crawpy_ss.clip(url.url)
-
-    """
-    """
-    # output section
-    if output != "":
-        import os
-        he.handler.info("Output file is {}".format(os.getcwd()+"/"+output))
-        with open(output,"w") as f:
-            for resp in he.handler.found_resps:
-                f.write(f"[{resp.status_code}] {resp.urls} \n")
-            f.close()
-    """
