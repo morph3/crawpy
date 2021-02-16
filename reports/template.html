@@ -1,0 +1,43 @@
+<html>
+    <head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css">
+
+</head>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap5.min.js"></script>
+
+<table id="urls" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Status Code</th>
+                <th>URL</th>
+                <th>Size</th>
+                <th>Words</th>
+                <th>Lines</th>
+            </tr>
+        </thead>
+        <tbody>
+               placeholder
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Status Code</th>
+                <th>URL</th>
+                <th>Size</th>
+                <th>Words</th>
+                <th>Lines</th>
+            </tr>
+        </tfoot>
+    </table>
+    <script>
+        $(document).ready(function() {
+            $('#urls').DataTable({
+                "pageLength": 100,
+                "lengthMenu": [ 30, 50, 100, 300 ]
+            });
+        } );
+    </script>
+</html>

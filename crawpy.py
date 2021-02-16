@@ -243,7 +243,7 @@ if __name__ == "__main__":
     if conf['generate_report_enabled']:
         conf['output_file_txt'].close()
 
-        template_html = open("reports/template.html").read()
+        template_html = open(f"{base_path}/reports/template.html").read()
         conf['output_file_html'].write(template_html.replace("placeholder",conf['html_report']))
         conf['output_file_html'].close()
 
