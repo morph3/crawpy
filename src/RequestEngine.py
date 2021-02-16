@@ -215,42 +215,50 @@ class RequestEngine:
                     if status_code < 300:
                         self.progress_bar.clear()
                         _url = f"{GREEN}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+30)
+                        _url = _url.ljust(self.base_url_length+50)
                         sys.stdout.write(f"{_url}{info} \n")
                         
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
-                            self.conf['output_file'].write(f"{_} {info} \n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
+                            self.conf['output_file_txt'].write(f"{_} {info} \n")
+                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            self.conf['html_report'] += html_text
 
                     elif status_code >= 300 and status_code < 400:
                         self.progress_bar.clear()
                         _url = f"{BLUE}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+30)
+                        _url = _url.ljust(self.base_url_length+50)
                         sys.stdout.write(f"{_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
-                            self.conf['output_file'].write(f"{_} {info} \n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
+                            self.conf['output_file_txt'].write(f"{_} {info} \n")
+                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            self.conf['html_report'] += html_text
                     
                     elif status_code >= 400 and status_code < 403:
                         self.progress_bar.clear()
                         _url = f"{YELLOW}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+30)
+                        _url = _url.ljust(self.base_url_length+50)
                         sys.stdout.write(f"{_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
-                            self.conf['output_file'].write(f"{_} {info} \n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
+                            self.conf['output_file_txt'].write(f"{_} {info} \n")
+                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            self.conf['html_report'] += html_text
                     
                     elif status_code >= 404:
                         self.progress_bar.clear()                     
                         _url = f"{RED}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+30)
+                        _url = _url.ljust(self.base_url_length+50)
                         sys.stdout.write(f"{_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+30)
-                            self.conf['output_file'].write(f"{_} {info} \n")
+                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
+                            self.conf['output_file_txt'].write(f"{_} {info} \n")
+                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            self.conf['html_report'] += html_text
 
     async def backup_filters(self):
         self.conf['filter_code'] = self.conf['filter_code_backup'].copy()

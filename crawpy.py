@@ -143,10 +143,14 @@ if __name__ == "__main__":
         conf['generate_report_enabled'] = True
         if "reports/" in args.output_file:
             _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","_") # i know this is ugly but it works
-            conf['output_file'] = open(f"{args.output_file}{_url}.txt","w")  
+            conf['output_file_txt'] = open(f"{args.output_file}{_url}.txt","w")
+            conf['output_file_html'] = open(f"{args.output_file}{_url}.html","w")
+            
         else:
             _url = args.url.replace("://","_").replace(".","_").replace("FUZZ","").replace("/","_") # i know this is ugly but it works
-            conf['output_file'] = open(f"{args.output_file}/{_url}","w") 
+            conf['output_file_txt'] = open(f"{args.output_file}/{_url}.txt","w")
+            conf['output_file_html'] = open(f"{args.output_file}/{_url}.html","w")
+            
 
     if args.headers != None:
         for header in args.headers:
@@ -206,7 +210,8 @@ if __name__ == "__main__":
     if conf['is_recursive']:
         sys.stdout.write(f"{YELLOW}[!] Recursive scan enabled with depth {conf['recursive_depth']}{RESET}\n")
     if conf['generate_report_enabled']:
-        sys.stdout.write(f"{YELLOW}[!] Generate report enabled, writing: {conf['output_file'].name}{RESET}\n")
+        sys.stdout.write(f"{YELLOW}[!] Generate report enabled, writing: {conf['output_file_txt'].name}{RESET}\n")
+        sys.stdout.write(f"{YELLOW}[!] Generate report enabled, writing: {conf['output_file_html'].name}{RESET}\n")
 
     if os.name != 'nt':
         os.system("stty -echo")
@@ -223,7 +228,8 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         sys.stdout.write(f"{RED}[!] Keyboard interrupt recieved, exiting ...{RESET}\n")
         try: 
-            conf['output_file'].close() # try to close the file on interrupts
+            conf['output_file_txt'].close() # try to close the file on interrupts
+            conf['output_file_html'].close() # try to close the file on interrupts
         except:
             pass
         pass
@@ -235,6 +241,10 @@ if __name__ == "__main__":
         os.system("stty echo")    
     
     if conf['generate_report_enabled']:
-        conf['output_file'].close()
+        conf['output_file_txt'].close()
+
+        template_html = open("reports/template.html").read()
+        conf['output_file_html'].write(template_html.replace("placeholder",conf['html_report']))
+        conf['output_file_html'].close()
 
     flush_input()

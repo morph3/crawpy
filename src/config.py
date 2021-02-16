@@ -2,7 +2,10 @@
 config = {
         'is_recursive' : False,
         'generate_report_enabled' : False,
-        'output_file' : None,
+        'output_file_txt' : None,
+        'output_file_html' : None,
+        'html_report' : "",
+        
         'wordlist' : "",
         'threads' : 20, # default, asynchronous so 
         'timeout' : 0,
