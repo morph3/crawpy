@@ -221,7 +221,7 @@ class RequestEngine:
                         if self.conf['generate_report_enabled']:
                             _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
                             self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            html_text = f"\n<tr>\n<td> <a style=\"color:rgb(35, 184, 35)\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
                             self.conf['html_report'] += html_text
 
                     elif status_code >= 300 and status_code < 400:
@@ -233,7 +233,7 @@ class RequestEngine:
                         if self.conf['generate_report_enabled']:
                             _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
                             self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            html_text = f"\n<tr>\n<td> <a style=\"color:rgb(8, 66, 192)\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
                             self.conf['html_report'] += html_text
                     
                     elif status_code >= 400 and status_code < 403:
@@ -245,7 +245,7 @@ class RequestEngine:
                         if self.conf['generate_report_enabled']:
                             _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
                             self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            html_text = f"\n<tr>\n<td> <a style=\"color:rgb(190, 190, 53)\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
                             self.conf['html_report'] += html_text
                     
                     elif status_code >= 404:
@@ -257,7 +257,7 @@ class RequestEngine:
                         if self.conf['generate_report_enabled']:
                             _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
                             self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr><td>{status_code}</td>\n<td><a href=\"{url}\">{url}</a></td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td></tr>\n\n"
+                            html_text = f"\n<tr>\n<td> <a style=\"color:red\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
                             self.conf['html_report'] += html_text
 
     async def backup_filters(self):
