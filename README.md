@@ -16,6 +16,13 @@ What makes this tool different than others:
 ### An example run with auto calibration and recursive mode enabled
 [![asciicast](https://asciinema.org/a/370486.svg)](https://asciinema.org/a/370486)
 
+### Example reports
+
+Example reports can be found here
+```
+https://morph3sec.com/crawpy/example.html
+https://morph3sec.com/crawpy/example.txt
+```
 
 # Installation
 
