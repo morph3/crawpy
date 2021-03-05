@@ -27,7 +27,7 @@ python3 -m pip install -r requirements.txt
 ```
 
 # Usage
-s
+
 ```
 usage: crawpy.py [-h] [-u URL] [-w WORDLIST] [-t THREADS] [-r RECURSIVE]
                  [-rd RECURSIVE_DEPTH] [-e EXTENSIONS] [-to TIMEOUT] [-follow]
@@ -94,12 +94,12 @@ optional arguments:
 
 
 # Examples
+
 ```
 python3 crawpy.py -u https://facebook.com/FUZZ -w ./common.txt  -k -ac  -e .php,.html
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -k -fw 9,83 -r 301,302 -rd 2
 python3 crawpy.py -u https://morph3sec.com/FUZZ -w ./common.txt -e .php,.html -t 20 -ac -k
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -ac -gr
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -ac -gr -o /tmp/test.txt
-sudo python3 crawpy.py -l urls.txt  -gr -w ./common.txt -t 20 -o custom_reports -k -ac -s
+sudo python3 crawpy.py -l urls.txt -lt 20 -gr -w ./common.txt -t 20 -o custom_reports -k -ac -s
 ```
-

@@ -127,12 +127,22 @@ class RequestEngine:
                 self.conf['filter_code'].append(status_codes[0])
 
         if len(set(word_counts)) == 1:
-            self.conf['filter_word'].append(word_counts[0])
+            if word_counts[0] < 7:
+                pass # if the word count is less than 5, pass it 
+            else:
+                self.conf['filter_word'].append(word_counts[0])
 
         elif len(set(word_counts)) == 2:
             _list = list(set(word_counts))
-            self.conf['filter_word'].append(_list[0])
-            self.conf['filter_word'].append(_list[1])
+            if _list[0] < 7:
+                pass
+            else:
+                self.conf['filter_word'].append(_list[0])
+            if _list[1] < 7:
+                pass
+            else:
+                self.conf['filter_word'].append(_list[1])
+
 
         if len(set(size_counts)) == 1:
             self.conf['filter_size'].append(size_counts[0])
