@@ -26,16 +26,17 @@ def surpress(f):
 class RequestEngine:
     def __init__(self,config):
         self.conf = config
-        self.is_finished = False
-        self.crafted_urls = []
-        self.crafted_urls_length = 0        
-        self.base_url_length = len(self.conf['base_url'])
-        self.async_session = None
-        self.found_urls =  [] 
-        self.recursing_urls = []
-        self.is_recursing = False
-        self.progress_bar = None
-        self.error_count = 0
+        self.is_finished            = False
+        self.crafted_urls           = []
+        self.crafted_urls_length    = 0        
+        self.base_url_length        = len(self.conf['base_url'])
+        self.async_session          = None
+        self.found_urls             =  [] 
+        self.recursing_urls         = []
+        self.is_recursing           = False
+        self.progress_bar           = None
+        self.error_count            = 0
+        self.max_line_size          = 110
 
         
     @surpress
@@ -50,10 +51,10 @@ class RequestEngine:
                                         total=self.conf['timeout'])
                                         ) as response:
                 status_code = response.status
-                _text = await response.text()
-                word_count = len(_text.split(" "))
-                size_count = len(_text)
-                line_count = len(_text.split("\n"))
+                text = await response.text()
+                word_count = len(text.split(" "))
+                size_count = len(text)
+                line_count = len(text.split("\n"))
 
                 #sys.stdout.write(f"{status_code},{word_count},{size_count},{line_count}\n")
                 report.append(f"{status_code},{word_count},{size_count},{line_count}")
@@ -98,10 +99,10 @@ class RequestEngine:
         # iterate for every combination
         # if all status codes are same, apply it as a filter etc.
         for r in report:
-            _r = r.split(",")
-            status_codes.append(int(_r[0]))
-            word_counts.append(int(_r[1]))
-            size_counts.append(int(_r[2]))
+            r_splitted = r.split(",")
+            status_codes.append(int(r_splitted[0]))
+            word_counts.append(int(r_splitted[1]))
+            size_counts.append(int(r_splitted[2]))
             #line_counts.append(_r[3])
             """
             sys.stdout.write(f"{MAGENTA}Status code:{status_codes}\n{RESET}")
@@ -120,8 +121,8 @@ class RequestEngine:
                 self.conf['filter_code'].append(status_codes[0])
 
         elif len(set(status_codes)) == 2:
-            _list = list(set(status_codes))
-            if _list[0] == 200:
+            status_codes = list(set(status_codes))
+            if status_codes[0] == 200:
                 pass
             else:
                 self.conf['filter_code'].append(status_codes[0])
@@ -133,24 +134,24 @@ class RequestEngine:
                 self.conf['filter_word'].append(word_counts[0])
 
         elif len(set(word_counts)) == 2:
-            _list = list(set(word_counts))
-            if _list[0] < 7:
+            word_counts = list(set(word_counts))
+            if word_counts[0] < 7:
                 pass
             else:
-                self.conf['filter_word'].append(_list[0])
-            if _list[1] < 7:
+                self.conf['filter_word'].append(word_counts[0])
+            if word_counts[1] < 7:
                 pass
             else:
-                self.conf['filter_word'].append(_list[1])
+                self.conf['filter_word'].append(word_counts[1])
 
 
         if len(set(size_counts)) == 1:
             self.conf['filter_size'].append(size_counts[0])
 
         elif len(set(size_counts)) == 2:
-            _list = list(set(size_counts))
-            self.conf['filter_size'].append(_list[0])
-            self.conf['filter_size'].append(_list[1])
+            size_counts = list(set(size_counts))
+            self.conf['filter_size'].append(size_counts[0])
+            self.conf['filter_size'].append(size_counts[1])
 
 
         sys.stdout.write(f"{YELLOW}[*] Calibrated, applied filters:\n{RESET}")
@@ -180,14 +181,14 @@ class RequestEngine:
         return
 
     def update_extensions(self):
-        _updated = []
+        updated = []
         for url in self.crafted_urls:
-            _updated.insert(0,url)
+            updated.insert(0,url)
             for ext in self.conf['extensions']:
-                _updated.insert(-1,url+ext)
+                updated.insert(-1,url+ext)
 
         self.crafted_urls_length = self.crafted_urls_length + self.crafted_urls_length * len(self.conf['extensions'])
-        self.crafted_urls = _updated
+        self.crafted_urls = updated
         #sys.stdout.write(f"{self.crafted_urls} -> {self.crafted_urls_length}")
         return
 
@@ -205,11 +206,17 @@ class RequestEngine:
                                         proxy=self.conf['proxy_server']) as response:
                 self.progress_bar.update(1)
                 status_code = response.status
-                _text = await response.text()
-                word_count = len(_text.split(" "))
-                size_count = len(_text)
-                line_count = len(_text.split("\n"))
-                
+                text = await response.text()
+                word_count = len(text.split(" "))
+                size_count = len(text)
+                line_count = len(text.split("\n"))
+                redirect_location = ""
+                if status_code >= 300 and status_code < 400:
+                    redirect_location = response.headers["Location"]
+
+                html_text = f"\n<tr>\n<td> <a style=\"COLOR_PLACE_HOLDER\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n<td>{redirect_location}</td>\n</tr>\n\n"
+
+                # color:rgb(190, 190, 53)
                 if (status_code in self.conf['filter_code']) or (line_count in self.conf['filter_line']) or (size_count in self.conf['filter_size']) or (word_count in self.conf['filter_word'] ):
                     pass
                 else:
@@ -222,52 +229,66 @@ class RequestEngine:
                     if(status_code in self.conf['recursive_codes']) and (self.is_recursing == True):
                         self.recursing_urls.append(url)
                     
+
+                    # Status code below 300
                     if status_code < 300:
                         self.progress_bar.clear()
-                        _url = f"{GREEN}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+50)
-                        sys.stdout.write(f"{_url}{info} \n")
+                        formatted_url = f"{GREEN}[{status_code}] {url} {RESET}"
+                        formatted_url = formatted_url.ljust(self.max_line_size)
+                        sys.stdout.write(f"{formatted_url}{info} \n")
                         
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
-                            self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr>\n<td> <a style=\"color:rgb(35, 184, 35)\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
-                            self.conf['html_report'] += html_text
-
-                    elif status_code >= 300 and status_code < 400:
-                        self.progress_bar.clear()
-                        _url = f"{BLUE}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+50)
-                        sys.stdout.write(f"{_url}{info} \n")
-
-                        if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
-                            self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr>\n<td> <a style=\"color:rgb(8, 66, 192)\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
+                            self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
+                            html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(35, 184, 35)" ) # green 
                             self.conf['html_report'] += html_text
                     
+                    
+
+                    # Status code between 300 and 400
+                    elif status_code >= 300 and status_code < 400:
+                        # There is a redirection ? 
+                        self.progress_bar.clear()
+                        formatted_url = f"{BLUE}[{status_code}] {url} {RESET} -> {MAGENTA} {redirect_location} {RESET}"
+
+                        # 9 comes from the RESETs i think. There are 2 color and reset sections on the formatted_url above so if you dont add it the info section won't be aligned well. 
+                        formatted_url = formatted_url.ljust( self.max_line_size+9) 
+                        sys.stdout.write(f"{formatted_url} {info} \n")
+
+                        if self.conf['generate_report_enabled']:
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
+                            self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
+                            html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(8, 66, 192)" ) # blue 
+                            self.conf['html_report'] += html_text
+                    
+
+
+                    # Status code between 400 and 403
                     elif status_code >= 400 and status_code < 403:
                         self.progress_bar.clear()
-                        _url = f"{YELLOW}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+50)
-                        sys.stdout.write(f"{_url}{info} \n")
+                        formatted_url = f"{YELLOW}[{status_code}] {url} {RESET}"
+                        formatted_url = formatted_url.ljust(self.max_line_size)
+                        sys.stdout.write(f"{formatted_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
-                            self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr>\n<td> <a style=\"color:rgb(190, 190, 53)\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
+                            self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
+                            html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(190, 190, 53)" ) # yellowish 
                             self.conf['html_report'] += html_text
+
                     
+
+                    # status above 404
                     elif status_code >= 404:
                         self.progress_bar.clear()                     
-                        _url = f"{RED}[{status_code}] {url} {RESET}"
-                        _url = _url.ljust(self.base_url_length+50)
-                        sys.stdout.write(f"{_url}{info} \n")
+                        formatted_url = f"{RED}[{status_code}] {url} {RESET}"
+                        formatted_url = formatted_url.ljust(self.max_line_size)
+                        sys.stdout.write(f"{formatted_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            _ = f"[{status_code}] {url} ".ljust(self.base_url_length+50)
-                            self.conf['output_file_txt'].write(f"{_} {info} \n")
-                            html_text = f"\n<tr>\n<td> <a style=\"color:red\">{status_code}</a> </td></td>\n<td>\n<a href=\"{url}\">{url}</a>\n</td>\n<td>{size_count}</td>\n<td>{word_count}</td>\n<td>{line_count}</td>\n</tr>\n\n"
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
+                            self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
+                            html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:red" ) # yellowish 
                             self.conf['html_report'] += html_text
 
     async def backup_filters(self):
