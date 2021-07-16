@@ -238,7 +238,6 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url}{info} \n")
                         
                         if self.conf['generate_report_enabled']:
-                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(35, 184, 35)" ) # green 
                             self.conf['html_report'] += html_text
@@ -256,7 +255,6 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url} {info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(8, 66, 192)" ) # blue 
                             self.conf['html_report'] += html_text
@@ -271,7 +269,6 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(190, 190, 53)" ) # yellowish 
                             self.conf['html_report'] += html_text
@@ -286,7 +283,6 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
-                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:red" ) # yellowish 
                             self.conf['html_report'] += html_text
