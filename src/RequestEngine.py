@@ -264,7 +264,7 @@ class RequestEngine:
 
 
                     # Status code between 400 and 403
-                    elif status_code >= 400 and status_code < 403:
+                    elif status_code >= 400 and status_code < 404:
                         self.progress_bar.clear()
                         formatted_url = f"{YELLOW}[{status_code}] {url} {RESET}"
                         formatted_url = formatted_url.ljust(self.max_line_size)
