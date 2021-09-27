@@ -66,8 +66,10 @@ if __name__ == "__main__":
     
     # Optional options
     parser.add_argument("-t", "--threads", dest="threads", help="Size of the semaphore pool",default=50)
-    parser.add_argument("-r", "--recursive", dest="recursive",default=[],help="Recursive scan, specify status codes\n Example: 200,301,302")
-    parser.add_argument("-rd", "--recursive-depth", dest="recursive_depth",default=-1, type=int,help="Recursive scan depth,Example: 2")
+
+    parser.add_argument("-rc", "--recursive-codes", dest="recursive_codes", default=[], help="Recursive codes to scan recursively\nExample: 301,302,307")
+    parser.add_argument("-rp", "--recursive-paths", dest="recursive_paths", default=[], help="Recursive paths to scan recursively, please note that only given recursive paths will be scanned initially\nExample: admin,support,js,backup")
+    parser.add_argument("-rd", "--recursive-depth", dest="recursive_depth",default=-1, type=int, help="Recursive scan depth\nExample: 2")
     
 
     parser.add_argument("-e", "--extension", dest="extensions",default=[],help="Add extensions at the end. Seperate them with comas \n Example: -x .php,.html,.txt")
@@ -135,6 +137,11 @@ if __name__ == "__main__":
     conf['verify_ssl'] = args.verify_ssl
     conf['follow_redirects'] = args.follow_redirects
     conf['recursive_depth'] = args.recursive_depth
+    
+    if len(args.recursive_paths)>0:
+        conf['recursive_paths'] = args.recursive_paths.split(",")
+
+
     conf['auto_calibrate'] = args.auto_calibrate
     conf['proxy_server'] = args.proxy_server
 
@@ -173,9 +180,10 @@ if __name__ == "__main__":
     if len(args.extensions) > 0:
         conf['extensions'] = args.extensions.split(",")
 
-    if len(args.recursive) > 0:
+    if len(args.recursive_codes) > 0:
         conf['is_recursive'] = True
-        conf['recursive_codes'] = [int(_) for _ in args.recursive.split(",")]
+        conf['recursive_codes'] = [int(_) for _ in args.recursive_codes.split(",")]
+        
         conf['filter_code_backup'] = conf['filter_code'].copy()
         conf['filter_size_backup'] = conf['filter_size'].copy()
         conf['filter_word_backup'] = conf['filter_word'].copy()

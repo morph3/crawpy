@@ -18,6 +18,7 @@ config = {
         'verify_ssl' : True,
         'follow_redirects' : False,
         'recursive_codes' : [],
+        'recursive_paths' : [],
         'recursive_depth' : -1,
         'auto_calibrate' : False,
         # Matchers 

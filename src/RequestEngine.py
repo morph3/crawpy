@@ -238,6 +238,7 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url}{info} \n")
                         
                         if self.conf['generate_report_enabled']:
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(35, 184, 35)" ) # green 
                             self.conf['html_report'] += html_text
@@ -255,6 +256,7 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url} {info} \n")
 
                         if self.conf['generate_report_enabled']:
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(8, 66, 192)" ) # blue 
                             self.conf['html_report'] += html_text
@@ -269,6 +271,7 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size)
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(190, 190, 53)" ) # yellowish 
                             self.conf['html_report'] += html_text
@@ -283,6 +286,7 @@ class RequestEngine:
                         sys.stdout.write(f"{formatted_url}{info} \n")
 
                         if self.conf['generate_report_enabled']:
+                            formatted_url = f"[{status_code}] {url} ".ljust(self.max_line_size) 
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:red" ) # yellowish 
                             self.conf['html_report'] += html_text
@@ -301,20 +305,33 @@ class RequestEngine:
             await self.calibrate()
             #sys.exit(1)
 
+        if len(self.conf['recursive_paths']) > 0:
+            # user given some paths to scan so skip the initial scan and directly move to recursive scan
+            self.found_urls = [ f"{self.conf['base_url'].replace('FUZZ','')}{path}" for path in self.conf['recursive_paths']]
 
-        self.craft_urls()
-        self.update_extensions()
-        self.prepare_pbar()
-        semaphore = asyncio.Semaphore(self.conf['threads'])
-        async with aiohttp.ClientSession( connector=aiohttp.TCPConnector(verify_ssl=self.conf['verify_ssl']) ) as session:
-            tasks = []
-            for url in self.crafted_urls:
-                tasks.append(self.fetch(session, url, semaphore))
-            await asyncio.wait(tasks)
+            sys.stdout.write(f"{MAGENTA}Recursive paths given are:{RESET}\n")
+            for u in self.found_urls:
+                sys.stdout.write(f"{u}\n")
+
+
+        else:
+            self.craft_urls()
+            self.update_extensions()
+            self.prepare_pbar()
+            semaphore = asyncio.Semaphore(self.conf['threads'])
+            async with aiohttp.ClientSession( connector=aiohttp.TCPConnector(verify_ssl=self.conf['verify_ssl']) ) as session:
+                tasks = []
+                for url in self.crafted_urls:
+                    tasks.append(self.fetch(session, url, semaphore))
+                await asyncio.wait(tasks)
+        
         # Recursive mode.
         if self.conf['is_recursive']:
-            self.progress_bar.clear()
-            sys.stdout.write(f"\n{MAGENTA}[*] Recursive scan started{RESET}\n")
+
+            if not len(self.conf['recursive_paths']) > 0:
+                self.progress_bar.clear()
+
+            sys.stdout.write(f"\n{MAGENTA}[*] Recursive scan started{RESET}")
             #sys.stdout.write(f"{MAGENTA}Found urls {self.found_urls}{RESET}\n")
             
             while self.conf['recursive_depth'] != 0:
@@ -322,8 +339,11 @@ class RequestEngine:
                     self.is_recursing = True
 
                     self.conf['base_url'] = url+"/FUZZ"
-                    self.progress_bar.clear()
-                    sys.stdout.write(f"\n{MAGENTA}[*] {self.conf['base_url']}{RESET}\n")
+    
+                    if not len(self.conf['recursive_paths']) > 0:
+                        self.progress_bar.clear()
+    
+                    sys.stdout.write(f"\n\n{MAGENTA}[*] {self.conf['base_url']}{RESET}\n")
 
                     if self.conf['auto_calibrate']:
                         await self.backup_filters()

@@ -36,12 +36,9 @@ python3 -m pip install -r requirements.txt
 # Usage
 
 ```
-usage: crawpy.py [-h] [-u URL] [-w WORDLIST] [-t THREADS] [-r RECURSIVE]
-                 [-rd RECURSIVE_DEPTH] [-e EXTENSIONS] [-to TIMEOUT] [-follow]
-                 [-ac] [-fc FILTER_CODE] [-fs FILTER_SIZE] [-fw FILTER_WORD]
-                 [-fl FILTER_LINE] [-k] [-m MAX_RETRY] [-H HEADERS]
-                 [-o OUTPUT_FILE] [-gr] [-l URL_LIST] [-lt LIST_THREADS] [-s]
-                 [-X HTTP_METHOD] [-p PROXY_SERVER]
+morph3 ➜ crawpy/ [main✗] λ python3 crawpy.py --help
+usage: crawpy.py [-h] [-u URL] [-w WORDLIST] [-t THREADS] [-rc RECURSIVE_CODES] [-rp RECURSIVE_PATHS] [-rd RECURSIVE_DEPTH] [-e EXTENSIONS] [-to TIMEOUT] [-follow] [-ac] [-fc FILTER_CODE] [-fs FILTER_SIZE] [-fw FILTER_WORD] [-fl FILTER_LINE] [-k] [-m MAX_RETRY]
+                 [-H HEADERS] [-o OUTPUT_FILE] [-gr] [-l URL_LIST] [-lt LIST_THREADS] [-s] [-X HTTP_METHOD] [-p PROXY_SERVER]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,18 +47,16 @@ optional arguments:
                         Wordlist
   -t THREADS, --threads THREADS
                         Size of the semaphore pool
-  -r RECURSIVE, --recursive RECURSIVE
-                        Recursive scan, specify status codes Example:
-                        200,301,302
+  -rc RECURSIVE_CODES, --recursive-codes RECURSIVE_CODES
+                        Recursive codes to scan recursively Example: 301,302,307
+  -rp RECURSIVE_PATHS, --recursive-paths RECURSIVE_PATHS
+                        Recursive paths to scan recursively, please note that only given recursive paths will be scanned initially Example: admin,support,js,backup
   -rd RECURSIVE_DEPTH, --recursive-depth RECURSIVE_DEPTH
-                        Recursive scan depth,Example: 2
+                        Recursive scan depth Example: 2
   -e EXTENSIONS, --extension EXTENSIONS
-                        Add extensions at the end. Seperate them with comas
-                        Example: -x .php,.html,.txt
+                        Add extensions at the end. Seperate them with comas Example: -x .php,.html,.txt
   -to TIMEOUT, --timeout TIMEOUT
-                        Timeouts, I suggest you to not use this option because
-                        it is procudes lots of erros now which I was not able
-                        to solve why
+                        Timeouts, I suggest you to not use this option because it is procudes lots of erros now which I was not able to solve why
   -follow, --follow-redirects
                         Follow redirects
   -ac, --auto-calibrate
@@ -78,20 +73,15 @@ optional arguments:
   -m MAX_RETRY, --max-retry MAX_RETRY
                         Max retry
   -H HEADERS, --headers HEADERS
-                        Headers, you can set the flag multiple times.For
-                        example: -H "X-Forwarded-For: 127.0.0.1", -H "Host:
-                        foobar"
+                        Headers, you can set the flag multiple times.For example: -H "X-Forwarded-For: 127.0.0.1", -H "Host: foobar"
   -o OUTPUT_FILE, --output OUTPUT_FILE
                         Output folder
   -gr, --generate-report
-                        If you want crawpy to generate a report, default path
-                        is crawpy/reports/<url>.txt
+                        If you want crawpy to generate a report, default path is crawpy/reports/<url>.txt
   -l URL_LIST, --list URL_LIST
-                        Takes a list of urls as input and runs crawpy on via
-                        multiprocessing -l ./urls.txt
+                        Takes a list of urls as input and runs crawpy on via multiprocessing -l ./urls.txt
   -lt LIST_THREADS, --list-threads LIST_THREADS
-                        Number of threads for running crawpy parallely when
-                        running with list of urls
+                        Number of threads for running crawpy parallely when running with list of urls
   -s, --silent          Make crawpy not produce output
   -X HTTP_METHOD, --http-method HTTP_METHOD
                         HTTP request method
@@ -109,4 +99,5 @@ python3 crawpy.py -u https://morph3sec.com/FUZZ -w ./common.txt -e .php,.html -t
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -ac -gr
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -ac -gr -o /tmp/test.txt
 sudo python3 crawpy.py -l urls.txt -lt 20 -gr -w ./common.txt -t 20 -o custom_reports -k -ac -s
+python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt -ac -gr -rd 1 -rc 302,301 -rp admin,backup,support -k
 ```
