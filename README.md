@@ -94,7 +94,7 @@ optional arguments:
 
 ```
 python3 crawpy.py -u https://facebook.com/FUZZ -w ./common.txt  -k -ac  -e .php,.html
-python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -k -fw 9,83 -r 301,302 -rd 2
+python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt -k -fw 9,83 -rc 301,302 -rd 2 -ac
 python3 crawpy.py -u https://morph3sec.com/FUZZ -w ./common.txt -e .php,.html -t 20 -ac -k
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -ac -gr
 python3 crawpy.py -u https://google.com/FUZZ -w ./common.txt  -ac -gr -o /tmp/test.txt
