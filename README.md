@@ -2,12 +2,11 @@
 Yet another content discovery tool written in python.
 
 What makes this tool different than others:
-* It is written to work asynchronously which allows reaching to maximum limits. So it is very fast.
+* Sends asynchronous HTTP requests, fast
 * Calibration mode, applies filters on its own
-* Has bunch of flags that helps you fuzz in detail
-* Recursive scan mode for given status codes and with depth
-* Report generations, you can later go and check your results
-* Multiple url scans
+* Recursive scan mode with additional flags
+* Report generation, you can later go and check your results
+* Multiple url scan
 
 
 ### An example run
@@ -20,8 +19,8 @@ What makes this tool different than others:
 
 Example reports can be found here
 ```
-https://morph3sec.com/crawpy/example.html
-https://morph3sec.com/crawpy/example.txt
+https://morph3.blog/crawpy/example.html
+https://morph3.blog/crawpy/example.txt
 ```
 
 # Installation

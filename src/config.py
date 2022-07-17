@@ -7,9 +7,9 @@ config = {
         'html_report' : "",
         
         'wordlist' : "",
-        'threads' : 20, # default, asynchronous so 
+        'threads' : 20, # default 
         'timeout' : 0,
-        'extensions' : [], #list of extensipons
+        'extensions' : [], #list of extensions
         'base_url' : "",
         'directories' : [],
         'http_method' : "GET",
@@ -32,6 +32,6 @@ config = {
         'filter_word_backup' : [],
         'proxy_server': None,
         'headers' : {
-            'User-Agent' : 'crawpy/1.3 - github.com/morph3',
+            'User-Agent' : 'crawpy - github.com/morph3',
         }
 }

@@ -9,6 +9,7 @@ from src.Banner import Banner
 import asyncio
 import concurrent.futures
 import subprocess
+import random
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,6 +21,15 @@ BLUE    = Fore.BLUE
 YELLOW  = Fore.YELLOW
 MAGENTA  = Fore.MAGENTA
 
+user_agents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/92.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 Edg/103.0.1264.62"
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15",
+]
 
 def new_session(url):
         # we need to strip -lt  and -l flags from it
@@ -137,6 +147,8 @@ if __name__ == "__main__":
     conf['verify_ssl'] = args.verify_ssl
     conf['follow_redirects'] = args.follow_redirects
     conf['recursive_depth'] = args.recursive_depth
+    conf['headers']['User-Agent']  = random.choice(user_agents)
+    
     
     if len(args.recursive_paths)>0:
         conf['recursive_paths'] = args.recursive_paths.split(",")

@@ -39,5 +39,5 @@ class Banner:
         """)
 
     def greet(self):
-        print ("\n                                              Crawpy v1.4",end="")
+        print ("\n                                              Crawpy",end="")
         print (self.banners[random.randint(0, len(self.banners) - 1)])
