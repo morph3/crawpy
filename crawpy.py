@@ -239,10 +239,9 @@ if __name__ == "__main__":
     asyncio.set_event_loop(loop)
     #loop.set_debug(1)
     sys.stdout.write(f"{BLUE}-------------\n{RESET}")
-    
 
     try:
-        loop.run_until_complete(requester.run())
+        asyncio.run(requester.run())
     except KeyboardInterrupt:
         sys.stdout.write(f"{RED}[!] Keyboard interrupt recieved, exiting ...{RESET}\n")
         try: 

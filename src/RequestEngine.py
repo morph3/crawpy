@@ -19,7 +19,9 @@ def surpress(f):
         try:
             return await f(*args, **kwargs)
         except Exception as e:
-            print(e)
+            if len(args) > 0 and isinstance(args[0], RequestEngine):
+                args[0].error_count += 1
+                args[0].progress_bar.update(1)
             pass
     return wrapper
 
@@ -172,8 +174,9 @@ class RequestEngine:
             self.progress_bar.reset(total=self.crafted_urls_length)
         else:
             self.progress_bar = tqdm(
-                total=self.crafted_urls_length, ncols=50,desc="Fuzzing",
-                bar_format="[{rate_fmt:.5}]req/s -> {percentage:3.2f}% {bar} {n_fmt}/{total_fmt} #")
+                total=self.crafted_urls_length, ncols=100,desc="Fuzzing",
+                bar_format="[{rate_fmt:.5}]req/s -> {percentage:3.2f}% {bar} {n_fmt}/{total_fmt} (Errors: {postfix})")
+        self.progress_bar.set_postfix_str(f"{self.error_count}")
         return
 
     def update_extensions(self):
@@ -201,6 +204,7 @@ class RequestEngine:
                                         total=self.conf['timeout']), 
                                         proxy=self.conf['proxy_server']) as response:
                 self.progress_bar.update(1)
+                self.progress_bar.set_postfix_str(f"{self.error_count}")
                 status_code = response.status
                 text = await response.text()
                 word_count = len(text.split(" "))
