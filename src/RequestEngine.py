@@ -18,7 +18,8 @@ def surpress(f):
     async def wrapper(*args, **kwargs):
         try:
             return await f(*args, **kwargs)
-        except:
+        except Exception as e:
+            print(e)
             pass
     return wrapper
 
@@ -59,7 +60,6 @@ class RequestEngine:
                 #sys.stdout.write(f"{status_code},{word_count},{size_count},{line_count}\n")
                 report.append(f"{status_code},{word_count},{size_count},{line_count}")
                 #print(report)
-
         return
 
 
@@ -82,13 +82,12 @@ class RequestEngine:
 
         semaphore = asyncio.Semaphore(5)
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=self.conf['verify_ssl']) ) as session:
-            tasks = []
             report = []
+            tasks = []
             for str in random_strs:
-                tasks.append(self.calibrate_fetch(session, self.conf['base_url'].replace("FUZZ",str), semaphore, report))    
-            await asyncio.wait(tasks)
+                tasks.append(asyncio.create_task(self.calibrate_fetch(session, self.conf['base_url'].replace("FUZZ",str), semaphore, report)))    
+            await asyncio.gather(*tasks)
 
-        
         # Analyze section        
         # not sure if applying filters using line counts is a wise idea
         #line_counts = []
@@ -110,7 +109,6 @@ class RequestEngine:
             sys.stdout.write(f"{MAGENTA}Size count:{size_counts}\n{RESET}")
             #sys.stdout.write(f"{MAGENTA}Line count:{line_count}\n{RESET}")
             """
-
 
         # apply them as filters
         # i think we can trust only 1 filter code
@@ -158,9 +156,7 @@ class RequestEngine:
         sys.stdout.write(f"{YELLOW}[*] Filter codes: {self.conf['filter_code']}\n{RESET}")
         sys.stdout.write(f"{YELLOW}[*] Filter words: {self.conf['filter_word']}\n{RESET}")
         sys.stdout.write(f"{YELLOW}[*] Filter size: {self.conf['filter_size']}\n{RESET}")
-
         return
-
 
     def craft_urls(self):
         self.crafted_urls = [] # makesure its cleared at first
@@ -229,7 +225,6 @@ class RequestEngine:
                     if(status_code in self.conf['recursive_codes']) and (self.is_recursing == True):
                         self.recursing_urls.append(url)
                     
-
                     # Status code below 300
                     if status_code < 300:
                         self.progress_bar.clear()
@@ -243,8 +238,6 @@ class RequestEngine:
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(35, 184, 35)" ) # green 
                             self.conf['html_report'] += html_text
                     
-                    
-
                     # Status code between 300 and 400
                     elif status_code >= 300 and status_code < 400:
                         # There is a redirection ? 
@@ -261,8 +254,6 @@ class RequestEngine:
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(8, 66, 192)" ) # blue 
                             self.conf['html_report'] += html_text
                     
-
-
                     # Status code between 400 and 403
                     elif status_code >= 400 and status_code < 404:
                         self.progress_bar.clear()
@@ -275,9 +266,6 @@ class RequestEngine:
                             self.conf['output_file_txt'].write(f"{formatted_url} {info} \n")
                             html_text = html_text.replace("COLOR_PLACE_HOLDER", "color:rgb(190, 190, 53)" ) # yellowish 
                             self.conf['html_report'] += html_text
-
-                    
-
                     # status above 404
                     elif status_code >= 404:
                         self.progress_bar.clear()                     
@@ -299,35 +287,28 @@ class RequestEngine:
         
     @surpress
     async def run(self):
-        
         if self.conf['auto_calibrate']:
-            # backup
             await self.calibrate()
-            #sys.exit(1)
 
         if len(self.conf['recursive_paths']) > 0:
-            # user given some paths to scan so skip the initial scan and directly move to recursive scan
             self.found_urls = [ f"{self.conf['base_url'].replace('FUZZ','')}{path}" for path in self.conf['recursive_paths']]
-
             sys.stdout.write(f"{MAGENTA}Recursive paths given are:{RESET}\n")
             for u in self.found_urls:
                 sys.stdout.write(f"{u}\n")
-
 
         else:
             self.craft_urls()
             self.update_extensions()
             self.prepare_pbar()
-            semaphore = asyncio.Semaphore(self.conf['threads'])
+            semaphore = asyncio.Semaphore(min(self.conf['threads'], 50))  # Limit to 50 max threads
             async with aiohttp.ClientSession( connector=aiohttp.TCPConnector(verify_ssl=self.conf['verify_ssl']) ) as session:
                 tasks = []
                 for url in self.crafted_urls:
-                    tasks.append(self.fetch(session, url, semaphore))
-                await asyncio.wait(tasks)
+                    tasks.append(asyncio.create_task(self.fetch(session, url, semaphore)))
+                await asyncio.gather(*tasks)
         
         # Recursive mode.
         if self.conf['is_recursive']:
-
             if not len(self.conf['recursive_paths']) > 0:
                 self.progress_bar.clear()
 
@@ -337,9 +318,7 @@ class RequestEngine:
             while self.conf['recursive_depth'] != 0:
                 for url in self.found_urls:
                     self.is_recursing = True
-
-                    self.conf['base_url'] = url+"/FUZZ"
-    
+                    self.conf['base_url'] = f"{url}/FUZZ"
                     if not len(self.conf['recursive_paths']) > 0:
                         self.progress_bar.clear()
     
@@ -352,12 +331,13 @@ class RequestEngine:
                     self.craft_urls()
                     self.update_extensions()
                     self.prepare_pbar()
-                    semaphore = asyncio.Semaphore(self.conf['threads'])
+                    semaphore = asyncio.Semaphore(min(self.conf['threads'], 50))  # Limit to 50 max threads
                     async with aiohttp.ClientSession( connector=aiohttp.TCPConnector( verify_ssl=self.conf['verify_ssl']) ) as session:
                         tasks = []
                         for u in self.crafted_urls:
-                            tasks.append(self.fetch(session, u, semaphore))
-                        await asyncio.wait(tasks)
+                            tasks.append(asyncio.create_task(self.fetch(session, u, semaphore)))
+                        await asyncio.gather(*tasks)
+
                 self.found_urls = []
                 self.found_urls = self.recursing_urls.copy()
                 self.conf['recursive_depth'] -= 1

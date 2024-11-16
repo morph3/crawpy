@@ -31,6 +31,8 @@ user_agents = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15",
 ]
 
+
+
 def new_session(url):
         # we need to strip -lt  and -l flags from it
         sys.stdout.write(f"{MAGENTA}[*] Fuzzing: {url}/FUZZ\n{RESET}")
@@ -52,8 +54,6 @@ def new_session(url):
             stdout, stderr = proc.communicate()
 
 
-
-
 def flush_input():
     try:
         import msvcrt
@@ -65,8 +65,6 @@ def flush_input():
 
 
 if __name__ == "__main__":
-
-
 
     parser = argparse.ArgumentParser()
 
@@ -124,7 +122,6 @@ if __name__ == "__main__":
         url_file = open(args.url_list,"r").read()
         urls = url_file.split()
 
-
         sys.stdout.write(f"{YELLOW}[!] URL List supplied: {args.url_list}\n{RESET}")
         sys.stdout.write(f"{YELLOW}[!] Yielding url list on {args.list_threads} threads\n{RESET}")
         sys.stdout.write(f"{YELLOW}[!] Wordlist: {args.wordlist}\n{RESET}")
@@ -137,7 +134,6 @@ if __name__ == "__main__":
 
     conf = src.config.config
     # initialize
-
 
     conf['base_url'] = args.url
     conf['wordlist'] = args.wordlist
@@ -238,24 +234,27 @@ if __name__ == "__main__":
     
 
     requester = RequestEngine(conf)
-    loop = asyncio.get_event_loop()
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     #loop.set_debug(1)
     sys.stdout.write(f"{BLUE}-------------\n{RESET}")
     
+
     try:
         loop.run_until_complete(requester.run())
-
     except KeyboardInterrupt:
         sys.stdout.write(f"{RED}[!] Keyboard interrupt recieved, exiting ...{RESET}\n")
         try: 
-            conf['output_file_txt'].close() # try to close the file on interrupts
+            conf['output_file_txt'].close()
             conf['output_file_html'].close() # try to close the file on interrupts
         except:
             pass
         pass
     except:
         pass
-
+    finally:
+        loop.close()
 
     if os.name != 'nt':
         os.system("stty echo")    
@@ -268,3 +267,5 @@ if __name__ == "__main__":
         conf['output_file_html'].close()
 
     flush_input()
+    # make something here so it just don't segfault
+    sys.exit()
